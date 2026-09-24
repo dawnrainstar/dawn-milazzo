@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Volume2, VolumeX, Plus, Zap, Bot, LogIn, LogOut, CheckCircle2 } from 'lucide-react';
+import { Volume2, VolumeX, Plus, Zap, Bot, LogIn, LogOut, CheckCircle2, ClipboardCheck, TrendingUp } from 'lucide-react';
 import { planetaryAudio } from '../services/ambientAudio';
 import { useAuth } from '../context/AuthContext';
 import { PWAInstallButton } from './PWAInstallButton';
 
 interface HeaderProps {
-  activeTab: 'map' | 'database' | 'drones' | 'python' | 'chat';
-  setActiveTab: (tab: 'map' | 'database' | 'drones' | 'python' | 'chat') => void;
+  activeTab: 'map' | 'database' | 'drones' | 'management' | 'forecast' | 'python' | 'chat';
+  setActiveTab: (tab: 'map' | 'database' | 'drones' | 'management' | 'forecast' | 'python' | 'chat') => void;
   onOpenAddRegion: () => void;
   onOpenDispatchSwarm: () => void;
 }
@@ -89,6 +89,28 @@ export const Header: React.FC<HeaderProps> = ({
           }`}
         >
           Restoration Swarms
+        </button>
+        <button
+          onClick={() => setActiveTab('management')}
+          className={`transition-colors relative py-1 cursor-pointer flex items-center gap-1.5 ${
+            activeTab === 'management'
+              ? 'text-emerald-400 font-semibold after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-emerald-400'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <ClipboardCheck className="w-3.5 h-3.5 text-emerald-400" />
+          <span>EMS & Compliance</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('forecast')}
+          className={`transition-colors relative py-1 cursor-pointer flex items-center gap-1.5 ${
+            activeTab === 'forecast'
+              ? 'text-emerald-400 font-semibold after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-emerald-400'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
+          <span>2050 Forecast</span>
         </button>
         <button
           onClick={() => setActiveTab('python')}

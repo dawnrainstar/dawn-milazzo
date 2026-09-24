@@ -2,20 +2,23 @@ import React, { useState } from 'react';
 import { Region } from '../types';
 import { getVitalityStatus } from '../services/restorationEngine';
 import { remediation_matrix, toxicity_class } from '../services/earthDatabase';
-import { Zap, Trees, Droplets, Bug, Mountain, Sparkles, CheckCircle2, ShieldAlert, Cpu, Activity, Clock } from 'lucide-react';
+import { BioregionalRadarChart } from './BioregionalRadarChart';
+import { Zap, Trees, Droplets, Bug, Mountain, Sparkles, CheckCircle2, ShieldAlert, Cpu, Activity, Clock, ClipboardCheck } from 'lucide-react';
 
 interface RegionDetailPanelProps {
   region: Region;
   onUpdateRegionHealth: (id: number, fields: { forest_health?: number; soil_health?: number; water_health?: number; biodiversity?: number }) => void;
   onDispatchSwarm: (regionId: number) => void;
   onCommuneWithSpirit: (region: Region) => void;
+  onNavigateToEMS?: () => void;
 }
 
 export const RegionDetailPanel: React.FC<RegionDetailPanelProps> = ({
   region,
   onUpdateRegionHealth,
   onDispatchSwarm,
-  onCommuneWithSpirit
+  onCommuneWithSpirit,
+  onNavigateToEMS
 }) => {
   const status = getVitalityStatus(region.ecosystem_score);
   const tox = toxicity_class(region.ecosystem_score);
@@ -322,44 +325,46 @@ export const RegionDetailPanel: React.FC<RegionDetailPanelProps> = ({
         </div>
       </div>
 
-      {/* Two Column Layout: Restoration Engine Tasks vs Mythic Spirit Voice */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-2">
+      {/* Three Column Layout: Restoration Engine Tasks vs 6-Axis Radar vs Mythic Spirit Voice */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 pt-2">
         {/* Left Column: Restoration Recommendations */}
-        <div className="bg-[#090e13] border border-emerald-500/20 rounded-lg p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs uppercase font-mono tracking-wider font-semibold text-emerald-400 flex items-center gap-2">
-              <Zap className="w-3.5 h-3.5" />
-              Restoration Engine Directives
-            </h3>
-            <span className="text-[11px] font-mono text-slate-400">
-              {region.restoration_tasks.length} Active Prescriptions
-            </span>
-          </div>
-
-          <div className="space-y-2">
-            {region.restoration_tasks.map((task, idx) => (
-              <div
-                key={idx}
-                className="flex items-start gap-2.5 text-xs text-slate-200 bg-slate-900/60 border border-slate-800/80 p-2.5 rounded"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
-                <span>{task}</span>
-              </div>
-            ))}
-          </div>
-
-          {successMessage && (
-            <div className="flex items-center gap-2 text-xs font-mono text-emerald-300 bg-emerald-950/60 border border-emerald-500/40 p-2.5 rounded">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>{successMessage}</span>
+        <div className="bg-[#090e13] border border-emerald-500/20 rounded-lg p-4 space-y-3 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs uppercase font-mono tracking-wider font-semibold text-emerald-400 flex items-center gap-2">
+                <Zap className="w-3.5 h-3.5" />
+                Restoration Engine Directives
+              </h3>
+              <span className="text-[11px] font-mono text-slate-400">
+                {region.restoration_tasks.length} Active Prescriptions
+              </span>
             </div>
-          )}
 
-          <div className="flex items-center gap-3 pt-2">
+            <div className="space-y-2 mt-3">
+              {region.restoration_tasks.map((task, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-start gap-2.5 text-xs text-slate-200 bg-slate-900/60 border border-slate-800/80 p-2 rounded"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
+                  <span>{task}</span>
+                </div>
+              ))}
+            </div>
+
+            {successMessage && (
+              <div className="flex items-center gap-2 text-xs font-mono text-emerald-300 bg-emerald-950/60 border border-emerald-500/40 p-2.5 rounded mt-3">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>{successMessage}</span>
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2 pt-3">
             <button
               onClick={handleDeployInterventions}
               disabled={isApplyingInterventions}
-              className="flex-1 py-2 px-3 text-xs font-medium text-slate-950 bg-emerald-400 hover:bg-emerald-300 rounded font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="w-full py-2 px-3 text-xs font-medium text-slate-950 bg-emerald-400 hover:bg-emerald-300 rounded font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
               <Zap className="w-3.5 h-3.5" />
               {isApplyingInterventions ? "Deploying Bio-Protocols..." : "Apply Restoration Interventions"}
@@ -367,11 +372,26 @@ export const RegionDetailPanel: React.FC<RegionDetailPanelProps> = ({
 
             <button
               onClick={() => onDispatchSwarm(region.id)}
-              className="py-2 px-3 text-xs font-medium text-emerald-300 bg-emerald-950/40 border border-emerald-500/30 hover:bg-emerald-900/40 rounded transition-colors whitespace-nowrap cursor-pointer"
+              className="w-full py-2 px-3 text-xs font-medium text-emerald-300 bg-emerald-950/40 border border-emerald-500/30 hover:bg-emerald-900/40 rounded transition-colors whitespace-nowrap cursor-pointer text-center"
             >
               Dispatch Swarms ({region.active_drones_count} Active)
             </button>
+
+            {onNavigateToEMS && (
+              <button
+                onClick={onNavigateToEMS}
+                className="w-full py-2 px-3 text-xs font-mono text-cyan-300 bg-cyan-950/40 border border-cyan-500/30 hover:bg-cyan-900/40 rounded transition-colors whitespace-nowrap cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <ClipboardCheck className="w-3.5 h-3.5 text-cyan-400" />
+                <span>EMS / ISO 14001 File &rarr;</span>
+              </button>
+            )}
           </div>
+        </div>
+
+        {/* Center Column: 6-Axis Biospheric Radar Chart */}
+        <div className="flex flex-col justify-center">
+          <BioregionalRadarChart region={region} size={280} />
         </div>
 
         {/* Right Column: Mythic Earth Spirit Profile (Rainstar's Vision) */}

@@ -28,7 +28,7 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({ currentRegion, onI
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [model, setModel] = useState<'gemini-3.5-flash' | 'gemini-3.1-pro-preview' | 'gemini-3.1-flash-lite'>('gemini-3.5-flash');
+  const [model, setModel] = useState<'gemini-3.8-flash' | 'gemini-3.1-pro-preview' | 'gemini-3.1-flash-lite'>('gemini-3.8-flash');
   const [toolMode, setToolMode] = useState<'none' | 'search' | 'maps'>('maps');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 

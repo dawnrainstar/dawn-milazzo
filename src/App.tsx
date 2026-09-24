@@ -7,7 +7,11 @@ import { InteractiveEarthMap } from './components/InteractiveEarthMap';
 import { RegionDetailPanel } from './components/RegionDetailPanel';
 import { DatabaseExplorer } from './components/DatabaseExplorer';
 import { DroneSwarmCommand } from './components/DroneSwarmCommand';
+import { EnvironmentalManagementHub } from './components/EnvironmentalManagementHub';
+import { PlanetaryForecastingEngine } from './components/PlanetaryForecastingEngine';
 import { GeminiChatbot } from './components/GeminiChatbot';
+import { AppDirectionsHeader } from './components/AppDirectionsHeader';
+import { GlobalChatWidget } from './components/GlobalChatWidget';
 import { AddRegionModal } from './components/AddRegionModal';
 import { DispatchSwarmModal } from './components/DispatchSwarmModal';
 import { SpiritCommunionModal } from './components/SpiritCommunionModal';
@@ -26,7 +30,7 @@ function MainApp() {
   const [metrics, setMetrics] = useState<PlanetaryMetrics>(() => earthDB.getMetrics());
   const { currentUser } = useAuth();
 
-  const [activeTab, setActiveTab] = useState<'map' | 'database' | 'drones' | 'python' | 'chat'>('map');
+  const [activeTab, setActiveTab] = useState<'map' | 'database' | 'drones' | 'management' | 'forecast' | 'python' | 'chat'>('map');
   const [selectedRegion, setSelectedRegion] = useState<Region | null>(() => regions[0] || null);
 
   // Modals state
@@ -36,6 +40,7 @@ function MainApp() {
   const [dispatchTargetRegionId, setDispatchTargetRegionId] = useState<number | undefined>(undefined);
   const [isSpiritCommunionOpen, setIsSpiritCommunionOpen] = useState(false);
   const [spiritCommunionRegion, setSpiritCommunionRegion] = useState<Region | null>(null);
+  const [isGlobalChatOpen, setIsGlobalChatOpen] = useState(false);
 
   // Subscribe to live earth database changes
   useEffect(() => {
@@ -108,6 +113,12 @@ function MainApp() {
       {/* Real-time Planetary Metric Ticker: "How much life did we restore today?" */}
       <PlanetaryVitalityBar metrics={metrics} />
 
+      {/* Directions for using this app at the top */}
+      <AppDirectionsHeader
+        onNavigateTab={(tab) => setActiveTab(tab)}
+        onOpenChat={() => setIsGlobalChatOpen(true)}
+      />
+
       {/* Main Content Area */}
       <main className="flex-1 max-w-[1520px] w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
         {/* Tab 1: Living Map & Regional Inspector */}
@@ -131,6 +142,7 @@ function MainApp() {
                   onUpdateRegionHealth={handleUpdateRegionHealth}
                   onDispatchSwarm={handleOpenDispatchForRegion}
                   onCommuneWithSpirit={handleOpenSpiritCommunion}
+                  onNavigateToEMS={() => setActiveTab('management')}
                 />
               </div>
             )}
@@ -250,6 +262,31 @@ function MainApp() {
             onOpenDispatchModal={() => {
               setDispatchTargetRegionId(selectedRegion?.id);
               setIsDispatchSwarmOpen(true);
+            }}
+          />
+        )}
+
+        {/* Tab 3.5: Environmental Management System (EMS & ISO 14001) */}
+        {activeTab === 'management' && (
+          <EnvironmentalManagementHub
+            regions={regions}
+            onSelectRegion={reg => {
+              setSelectedRegion(reg);
+            }}
+            onOpenDispatchSwarm={regId => {
+              setDispatchTargetRegionId(regId || selectedRegion?.id);
+              setIsDispatchSwarmOpen(true);
+            }}
+          />
+        )}
+
+        {/* Tab 3.75: Planetary Forecasting Engine (2025–2050 Trajectory) */}
+        {activeTab === 'forecast' && (
+          <PlanetaryForecastingEngine
+            regions={regions}
+            onSelectRegion={reg => {
+              setSelectedRegion(reg);
+              setActiveTab('map');
             }}
           />
         )}
@@ -378,6 +415,21 @@ function MainApp() {
 
       {/* Offline connectivity indicator */}
       <OfflineIndicator />
+
+      {/* Global AI Chatbot Widget - Available everywhere to answer any questions */}
+      <GlobalChatWidget
+        currentRegion={selectedRegion}
+        isOpen={isGlobalChatOpen}
+        onClose={() => setIsGlobalChatOpen(false)}
+        onOpen={() => setIsGlobalChatOpen(true)}
+        onInspectLocation={(lat, lng) => {
+          const found = regions.find(r => Math.abs(r.latitude - lat) < 1 && Math.abs(r.longitude - lng) < 1);
+          if (found) {
+            setSelectedRegion(found);
+            setActiveTab('map');
+          }
+        }}
+      />
     </div>
   );
 }

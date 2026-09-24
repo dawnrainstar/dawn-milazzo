@@ -56,6 +56,18 @@ export interface DroneSwarm {
   dispatched_at: string;
 }
 
+export interface EnvironmentalManagementRecord {
+  regionId: number;
+  complianceStatus: 'FULL_COMPLIANCE' | 'ACTION_REQUIRED' | 'NON_COMPLIANT' | 'PERMIT_PENDING';
+  aspects: string[];
+  impacts: string[];
+  iso14001Stage: 'PLAN' | 'DO' | 'CHECK' | 'ACT';
+  regulations: string[];
+  remediationAction: string;
+  auditDueDate: string;
+  responsibleManager: string;
+}
+
 export interface PlanetaryMetrics {
   overallHealthScore: number;
   treesPlantedToday: number;

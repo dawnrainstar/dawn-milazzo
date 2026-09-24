@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import { Region } from '../types';
-import { Compass, Search, Filter, Plus, Globe, Layers, Download, ExternalLink } from 'lucide-react';
+import { Compass, Search, Filter, Plus, Globe, Layers, Download, ExternalLink, Mountain } from 'lucide-react';
 import { getVitalityStatus } from '../services/restorationEngine';
 import { toxicity_class } from '../services/earthDatabase';
 
@@ -25,8 +25,10 @@ export const InteractiveEarthMap: React.FC<InteractiveEarthMapProps> = ({
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterMode, setFilterMode] = useState<'all' | 'contaminated' | 'stressed' | 'resilient'>('all');
-  const [mapLayer, setMapLayer] = useState<'obsidian' | 'satellite' | 'topo'>('satellite');
+  const [mapLayer, setMapLayer] = useState<'obsidian' | 'satellite' | 'topo' | 'nasa-gibs'>('satellite');
   const [clickedCoords, setClickedCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [cursorCoords, setCursorCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [zoomLevel, setZoomLevel] = useState<number>(2.5);
 
   // Initialize Map
   useEffect(() => {
@@ -54,6 +56,18 @@ export const InteractiveEarthMap: React.FC<InteractiveEarthMapProps> = ({
     markersLayerRef.current = markersLayer;
     mapInstanceRef.current = map;
 
+    // Track cursor coordinates
+    map.on('mousemove', (e: L.LeafletMouseEvent) => {
+      setCursorCoords({
+        lat: parseFloat(e.latlng.lat.toFixed(4)),
+        lng: parseFloat(e.latlng.lng.toFixed(4))
+      });
+    });
+
+    map.on('zoomend', () => {
+      setZoomLevel(map.getZoom());
+    });
+
     // Click on map to capture latitude & longitude
     map.on('click', (e: L.LeafletMouseEvent) => {
       const lat = parseFloat(e.latlng.lat.toFixed(4));
@@ -67,7 +81,7 @@ export const InteractiveEarthMap: React.FC<InteractiveEarthMapProps> = ({
     };
   }, []);
 
-  // Switch Tile Layer (Satellite vs Obsidian vs Topo)
+  // Switch Tile Layer (Satellite vs Obsidian vs Topo vs NASA GIBS)
   useEffect(() => {
     if (!mapInstanceRef.current || !tileLayerRef.current) return;
 
@@ -81,6 +95,9 @@ export const InteractiveEarthMap: React.FC<InteractiveEarthMapProps> = ({
       subdomains = 'abcd';
     } else if (mapLayer === 'topo') {
       newUrl = 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png';
+      subdomains = 'abc';
+    } else if (mapLayer === 'nasa-gibs') {
+      newUrl = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/default/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg';
       subdomains = 'abc';
     }
 
@@ -469,23 +486,43 @@ export const InteractiveEarthMap: React.FC<InteractiveEarthMapProps> = ({
           <div className="flex items-center gap-1 bg-[#070b0e] border border-slate-800 rounded-lg p-0.5 text-xs font-mono">
             <button
               onClick={() => setMapLayer('satellite')}
-              title="Google Earth / Satellite high-resolution imagery"
-              className={`px-2.5 py-1 rounded flex items-center gap-1 transition-colors ${
+              title="Google Earth / Satellite high-resolution imagery (ESRI World Imagery)"
+              className={`px-2 py-1 rounded flex items-center gap-1 transition-colors ${
                 mapLayer === 'satellite' ? 'bg-emerald-500/20 text-emerald-300 font-semibold' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               <Globe className="w-3.5 h-3.5 text-blue-400" />
-              Earth Satellite
+              <span>Satellite</span>
+            </button>
+            <button
+              onClick={() => setMapLayer('nasa-gibs')}
+              title="NASA GIBS Near-Real-Time Terra / MODIS TrueColor Satellite Feed"
+              className={`px-2 py-1 rounded flex items-center gap-1 transition-colors ${
+                mapLayer === 'nasa-gibs' ? 'bg-emerald-500/20 text-emerald-300 font-semibold' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+              <span>NASA GIBS</span>
             </button>
             <button
               onClick={() => setMapLayer('obsidian')}
               title="Deep Space Obsidian dark vector map"
-              className={`px-2.5 py-1 rounded flex items-center gap-1 transition-colors ${
+              className={`px-2 py-1 rounded flex items-center gap-1 transition-colors ${
                 mapLayer === 'obsidian' ? 'bg-emerald-500/20 text-emerald-300 font-semibold' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               <Layers className="w-3.5 h-3.5 text-emerald-400" />
-              Obsidian
+              <span>Obsidian</span>
+            </button>
+            <button
+              onClick={() => setMapLayer('topo')}
+              title="Topographic contours and elevation relief"
+              className={`px-2 py-1 rounded flex items-center gap-1 transition-colors ${
+                mapLayer === 'topo' ? 'bg-emerald-500/20 text-emerald-300 font-semibold' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Mountain className="w-3.5 h-3.5 text-amber-400" />
+              <span>Topo</span>
             </button>
           </div>
 
@@ -522,6 +559,22 @@ export const InteractiveEarthMap: React.FC<InteractiveEarthMapProps> = ({
 
       {/* Map Container */}
       <div ref={mapContainerRef} className="w-full h-full z-0" />
+
+      {/* Live Cursor Coordinates & Telemetry HUD */}
+      {!clickedCoords && (
+        <div className="absolute bottom-4 left-4 z-[1000] bg-[#0b1015]/90 backdrop-blur-md border border-slate-800 px-3 py-1.5 rounded-lg shadow-xl hidden sm:flex items-center gap-3 text-[11px] font-mono text-slate-400 pointer-events-none">
+          <div className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-slate-200 font-semibold">
+              {cursorCoords ? `${cursorCoords.lat.toFixed(4)}°, ${cursorCoords.lng.toFixed(4)}°` : '0.0000°, 0.0000°'}
+            </span>
+          </div>
+          <span>&bull;</span>
+          <span>Zoom: <b className="text-emerald-400">{zoomLevel.toFixed(1)}x</b></span>
+          <span>&bull;</span>
+          <span className="text-slate-400 uppercase text-[10px]">{mapLayer}</span>
+        </div>
+      )}
 
       {/* Click-to-Add Coordinate Floating Banner */}
       {clickedCoords && (
