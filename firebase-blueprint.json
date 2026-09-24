@@ -1,0 +1,218 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with authentication and restoration activity tracking",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Firebase Auth UID",
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address",
+          "maxLength": 256
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User display name",
+          "maxLength": 128
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "User avatar photo URL",
+          "maxLength": 1024
+        },
+        "role": {
+          "type": "string",
+          "description": "User role in the restoration network",
+          "enum": ["steward", "scientist", "ranger", "admin"]
+        },
+        "restorationActionsCount": {
+          "type": "number",
+          "description": "Number of restoration actions performed by this user"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp of account creation",
+          "maxLength": 64
+        },
+        "lastActiveAt": {
+          "type": "string",
+          "description": "ISO timestamp of last activity",
+          "maxLength": 64
+        }
+      },
+      "required": ["id", "email", "role"]
+    },
+    "RegionRecord": {
+      "title": "RegionRecord",
+      "description": "An ecosystem region logged in the global planetary database",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Ecosystem name",
+          "maxLength": 128
+        },
+        "latitude": {
+          "type": "number",
+          "description": "Latitude coordinate (-90 to 90)"
+        },
+        "longitude": {
+          "type": "number",
+          "description": "Longitude coordinate (-180 to 180)"
+        },
+        "forest_health": {
+          "type": "number",
+          "description": "Canopy & forest score (0-100)"
+        },
+        "soil_health": {
+          "type": "number",
+          "description": "Microbial & carbon score (0-100)"
+        },
+        "water_health": {
+          "type": "number",
+          "description": "Aquifer & watershed score (0-100)"
+        },
+        "biodiversity": {
+          "type": "number",
+          "description": "Fauna & pollinator score (0-100)"
+        },
+        "ecosystem_score": {
+          "type": "number",
+          "description": "Overall vitality index (0-100)"
+        },
+        "biome": {
+          "type": "string",
+          "description": "Habitat biome category",
+          "maxLength": 128
+        },
+        "country": {
+          "type": "string",
+          "description": "Country or jurisdiction",
+          "maxLength": 128
+        },
+        "carbon_storage_tons": {
+          "type": "number",
+          "description": "Estimated sequestered carbon"
+        },
+        "canopy_cover_pct": {
+          "type": "number",
+          "description": "Canopy cover percentage"
+        },
+        "wildfire_risk": {
+          "type": "string",
+          "enum": ["LOW", "MODERATE", "SEVERE"]
+        },
+        "authorId": {
+          "type": "string",
+          "description": "UID of the user who logged this record",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp string",
+          "maxLength": 64
+        }
+      },
+      "required": ["name", "latitude", "longitude", "forest_health", "soil_health", "water_health", "biodiversity", "ecosystem_score"]
+    },
+    "SwarmMission": {
+      "title": "SwarmMission",
+      "description": "Autonomous restoration drone swarm mission record",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "type": {
+          "type": "string",
+          "enum": ["leaf", "river", "pollinator", "root", "sentinel"]
+        },
+        "regionId": {
+          "type": "number"
+        },
+        "regionName": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "units": {
+          "type": "number"
+        },
+        "mission": {
+          "type": "string",
+          "maxLength": 512
+        },
+        "dispatchedBy": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "status": {
+          "type": "string",
+          "enum": ["ACTIVE", "SEEDING", "CALIBRATING", "COMPLETED"]
+        },
+        "progress": {
+          "type": "number"
+        },
+        "dispatchedAt": {
+          "type": "string",
+          "maxLength": 64
+        }
+      },
+      "required": ["name", "type", "regionId", "units", "status", "progress"]
+    },
+    "RestorationAction": {
+      "title": "RestorationAction",
+      "description": "Individual restoration intervention action audit log",
+      "type": "object",
+      "properties": {
+        "regionId": {
+          "type": "number"
+        },
+        "regionName": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "actionType": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "summary": {
+          "type": "string",
+          "maxLength": 512
+        },
+        "timestamp": {
+          "type": "string",
+          "maxLength": 64
+        }
+      },
+      "required": ["regionId", "actionType", "summary"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User accounts and restoration steward profiles"
+    },
+    "/regions/{regionId}": {
+      "schema": "RegionRecord",
+      "description": "Community logged ecosystem regions with coordinates"
+    },
+    "/swarms/{swarmId}": {
+      "schema": "SwarmMission",
+      "description": "Autonomous restoration drone swarm missions"
+    },
+    "/restoration_actions/{actionId}": {
+      "schema": "RestorationAction",
+      "description": "Log of biological restoration interventions"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Ms. Heavy Metal Leaf — Planetary Earth Restoration Intelligence",
+  "description": "Global Earth-restoration database, real-time ecosystem vitality scoring, interactive planetary map, autonomous restoration swarms, and mythic ecological spirit telemetry (2025-2050).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

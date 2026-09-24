@@ -1,0 +1,107 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper Functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Connection test document
+    match /test/connection {
+      allow read: if true;
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isOwner(userId)
+        && incoming().id == userId
+        && incoming().email is string
+        && incoming().email.size() <= 256
+        && incoming().role is string
+        && incoming().role in ['steward', 'scientist', 'ranger', 'admin'];
+      allow update: if isOwner(userId)
+        && incoming().id == existing().id
+        && incoming().email == existing().email
+        && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL', 'restorationActionsCount', 'lastActiveAt']);
+      allow delete: if false;
+    }
+
+    // Ecosystem Regions Collection
+    match /regions/{regionId} {
+      allow read: if true;
+      allow create: if isSignedIn()
+        && isValidId(regionId)
+        && incoming().name is string
+        && incoming().name.size() <= 128
+        && incoming().latitude is number
+        && incoming().longitude is number
+        && incoming().forest_health is number
+        && incoming().soil_health is number
+        && incoming().water_health is number
+        && incoming().biodiversity is number
+        && incoming().ecosystem_score is number
+        && incoming().authorId == request.auth.uid;
+      allow update: if isSignedIn()
+        && (
+          (existing().authorId == request.auth.uid) ||
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'forest_health', 'soil_health', 'water_health',
+            'biodiversity', 'ecosystem_score', 'canopy_cover_pct', 'active_drones_count'
+          ])
+        );
+      allow delete: if isSignedIn() && existing().authorId == request.auth.uid;
+    }
+
+    // Autonomous Drone Swarms Collection
+    match /swarms/{swarmId} {
+      allow read: if true;
+      allow create: if isSignedIn()
+        && isValidId(swarmId)
+        && incoming().name is string
+        && incoming().name.size() <= 128
+        && incoming().type in ['leaf', 'river', 'pollinator', 'root', 'sentinel']
+        && incoming().regionId is number
+        && incoming().units is number
+        && incoming().status in ['ACTIVE', 'SEEDING', 'CALIBRATING', 'COMPLETED']
+        && incoming().dispatchedBy == request.auth.uid;
+      allow update: if isSignedIn()
+        && incoming().diff(existing()).affectedKeys().hasOnly(['progress', 'status']);
+      allow delete: if isSignedIn() && existing().dispatchedBy == request.auth.uid;
+    }
+
+    // Restoration Actions Log Collection
+    match /restoration_actions/{actionId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn()
+        && isValidId(actionId)
+        && incoming().regionId is number
+        && incoming().actionType is string
+        && incoming().summary is string
+        && incoming().userId == request.auth.uid;
+      allow update, delete: if false;
+    }
+  }
+}

@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0a141b"/>
+      <stop offset="100%" stop-color="#04070a"/>
+    </radialGradient>
+    <linearGradient id="leafGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="50%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+    <linearGradient id="metalSheen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#94a3b8" stop-opacity="0.8"/>
+      <stop offset="50%" stop-color="#475569" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#1e293b" stop-opacity="0.9"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background circular plaque with metal edge -->
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <rect width="496" height="496" x="8" y="8" rx="104" fill="none" stroke="#10b981" stroke-width="4" stroke-opacity="0.4"/>
+  <circle cx="256" cy="256" r="210" fill="none" stroke="#059669" stroke-width="1.5" stroke-dasharray="8 8" stroke-opacity="0.35"/>
+
+  <!-- Heavy Metal Leaf Core Geometry -->
+  <g transform="translate(256, 256) rotate(-45) translate(-256, -256)">
+    <!-- Base Leaf Form -->
+    <path d="M256,70 C360,70 420,170 420,280 C420,380 340,430 256,442 C172,430 92,380 92,280 C92,170 152,70 256,70 Z" 
+          fill="url(#leafGrad)" />
+    
+    <!-- Metallic Overlay & Vein Circuits -->
+    <path d="M256,70 C360,70 420,170 420,280 C420,380 340,430 256,442 C172,430 92,380 92,280 C92,170 152,70 256,70 Z" 
+          fill="url(#metalSheen)" />
+
+    <!-- Central Vein / Spine -->
+    <line x1="256" y1="90" x2="256" y2="430" stroke="#f1f5f9" stroke-width="5" stroke-linecap="round"/>
+
+    <!-- Circuit Branch Veins -->
+    <path d="M256,150 L340,190 M256,210 L370,260 M256,270 L360,330 M256,330 L320,380" 
+          stroke="#e2e8f0" stroke-width="3.5" stroke-linecap="round" stroke-opacity="0.9"/>
+    <path d="M256,150 L172,190 M256,210 L142,260 M256,270 L152,330 M256,330 L192,380" 
+          stroke="#e2e8f0" stroke-width="3.5" stroke-linecap="round" stroke-opacity="0.9"/>
+
+    <!-- Bio-Sensor Nodes on leaf tips -->
+    <circle cx="340" cy="190" r="6" fill="#34d399"/>
+    <circle cx="370" cy="260" r="6" fill="#34d399"/>
+    <circle cx="360" cy="330" r="6" fill="#34d399"/>
+    <circle cx="320" cy="380" r="6" fill="#34d399"/>
+
+    <circle cx="172" cy="190" r="6" fill="#34d399"/>
+    <circle cx="142" cy="260" r="6" fill="#34d399"/>
+    <circle cx="152" cy="330" r="6" fill="#34d399"/>
+    <circle cx="192" cy="380" r="6" fill="#34d399"/>
+
+    <circle cx="256" cy="90" r="8" fill="#6ee7b7"/>
+  </g>
+
+  <!-- Resonance Telemetry Ring -->
+  <circle cx="256" cy="256" r="236" fill="none" stroke="#34d399" stroke-width="2" stroke-opacity="0.6"/>
+</svg>

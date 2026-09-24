@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    background-color: #070b0e;
+    color: #e2e8f0;
+  }
+}
+
+.font-display {
+  font-family: 'Chakra Petch', 'Plus Jakarta Sans', sans-serif;
+}
+
+.font-mono-code {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Custom dark styling for Leaflet */
+.leaflet-container {
+  background-color: #05080b !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  outline: none;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #0d1318 !important;
+  color: #e2e8f0 !important;
+  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
+}
+
+.leaflet-popup-tip {
+  background: #0d1318 !important;
+}
+
+.leaflet-control-zoom a {
+  background-color: #0d1318 !important;
+  color: #10b981 !important;
+  border-color: #1f2937 !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background-color: #1a232b !important;
+  color: #34d399 !important;
+}
+
+.leaflet-bar {
+  border: 1px solid #1f2937 !important;
+  border-radius: 6px !important;
+  overflow: hidden;
+}
+
+/* Pulse animation for restoration markers */
+@keyframes bio-ping {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  70% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+.animate-bio-ping {
+  animation: bio-ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}

@@ -1,0 +1,30 @@
+{
+  "name": "MS Heavy Metal Leaf",
+  "short_name": "HML",
+  "description": "Planetary Earth Restoration Intelligence & Ecological Regeneration (2025–2050)",
+  "display": "standalone",
+  "theme_color": "#070b0e",
+  "background_color": "#070b0e",
+  "start_url": "/",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
